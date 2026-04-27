@@ -1,0 +1,7 @@
+0 Klasse 1 voll grün
+1 Klasse 2 mehr grün als gelb 
+2 Klasse 3 mehr gelb als grün 
+3 Klasse 4 gelb mit grünen Spitzen
+4 klasse 5 vollgelb 
+5 Klasse 6 gelb mit braunen Stellen
+6 Klasse 7 vollbraun
