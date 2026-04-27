@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
-import tf_keras
+import keras
 import datetime
 
 st.set_page_config(page_title="🍌 Banana Ripeness Tracker", layout="centered")
@@ -22,7 +22,7 @@ OPTIMAL_STAGE = 3
 
 @st.cache_resource
 def load_model():
-    model = tf_keras.models.load_model("model/keras_model.h5", compile=False)
+    model = keras.models.load_model("model/keras_model.h5", compile=False)
     return model
 
 model = load_model()
