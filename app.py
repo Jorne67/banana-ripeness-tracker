@@ -1,15 +1,13 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
-import tf_keras as tf
+import tf_keras
 import datetime
 
 st.set_page_config(page_title="🍌 Banana Ripeness Tracker", layout="centered")
-
 st.title("🍌 Banana Ripeness Tracker")
 st.markdown("Lade ein Foto deiner Banane hoch und die App bestimmt den Reifegrad.")
 
-# Reifegrad-Skala
 RIPENESS_LABELS = {
     0: "🟢 Stufe 1 – Grün",
     1: "🟡🟢 Stufe 2 – Mehr grün als gelb",
@@ -19,14 +17,12 @@ RIPENESS_LABELS = {
     5: "🟡🟤 Stufe 6 – Vollgelb mit braunen Punkten",
     6: "🟤 Stufe 7 – Braun",
 }
-
 DAYS_TO_RIPEN = {0: 5, 1: 4, 2: 3, 3: 0, 4: -1, 5: -2, 6: -3}
 OPTIMAL_STAGE = 3
 
-# Modell laden
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model("model/keras_model.h5", compile=False)
+    model = tf_keras.models.load_model("model/keras_model.h5", compile=False)
     return model
 
 model = load_model()
