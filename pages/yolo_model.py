@@ -26,7 +26,6 @@ def load_yolo():
 model = load_yolo()
 
 def analyze_color(image, box):
-    """Analysiert die Farbe der Banane innerhalb der Bounding Box."""
     x1, y1, x2, y2 = map(int, box)
     crop = np.array(image.crop((x1, y1, x2, y2)))
     r = crop[:,:,0].mean()
@@ -34,19 +33,19 @@ def analyze_color(image, box):
     b = crop[:,:,2].mean()
 
     if g > r and g > b:
-        return 0  # Grün
+        return 0
     elif r > 200 and g > 200 and b < 100:
-        return 4  # Vollgelb
+        return 4
     elif r > 180 and g > 160 and b < 80:
-        return 3  # Gelb mit grünen Spitzen
+        return 3
     elif r > 150 and g > 130 and b < 80:
-        return 2  # Mehr gelb als grün
+        return 2
     elif r > 120 and g > 100 and b < 70:
-        return 1  # Mehr grün als gelb
+        return 1
     elif b > 80 and r > 150:
-        return 5  # Braune Punkte
+        return 5
     else:
-        return 6  # Braun
+        return 6
 
 if "bananas_yolo" not in st.session_state:
     st.session_state.bananas_yolo = []
@@ -62,10 +61,15 @@ if uploaded_file:
     with st.spinner("🔍 YOLOv8 analysiert..."):
         results = model(np.array(image))
         banana_boxes = []
+        detected = []
         for result in results:
             for box in result.boxes:
-                if result.names[int(box.cls)] == "banana":
+                label = result.names[int(box.cls)]
+                detected.append(label)
+                if label == "banana":
                     banana_boxes.append(box.xyxy[0].tolist())
+
+    st.write("🔍 Erkannte Objekte:", detected)
 
     st.divider()
     st.subheader("📊 Ergebnis")
