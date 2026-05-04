@@ -1,4 +1,6 @@
 streamlit
 tensorflow==2.15.1
+keras
 numpy
 pillow
+ultralytics
