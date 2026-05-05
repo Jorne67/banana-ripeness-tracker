@@ -23,7 +23,7 @@ DAYS_TO_OPTIMAL = {
     1: 5,
     2: 2,
     3: 0,
-    4: 0,   # Vollgelb ist jetzt auch optimal
+    4: 0,
     5: -2,
     6: -4,
 }
@@ -44,7 +44,7 @@ def predict_ripeness(image):
     img_array = np.array(img, dtype=np.float32) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
     predictions = model.predict(img_array)
-    class_index = np.argmax(predictions[0])
+    class_index = int(np.argmax(predictions[0]))
     confidence = predictions[0][class_index]
     return class_index, confidence
 
@@ -68,12 +68,11 @@ if uploaded_file:
     st.success(f"**Erkannter Reifegrad:** {RIPENESS_LABELS[class_index]}")
     st.write(f"Konfidenz: {confidence:.0%}")
 
-    # Manuelle Korrektur
     st.markdown("**Einschätzung korrekt?** Du kannst den Reifegrad manuell anpassen:")
     corrected_index = st.selectbox(
         "Reifegrad auswählen:",
         options=list(RIPENESS_LABELS.keys()),
-        index=class_index,
+        index=int(class_index),
         format_func=lambda x: RIPENESS_LABELS[x]
     )
 
