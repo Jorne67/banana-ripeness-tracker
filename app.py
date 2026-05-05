@@ -81,20 +81,21 @@ if uploaded_file:
 
     if st.button("✅ Banane speichern"):
         st.session_state.bananas.append(class_index)
-        st.success("Banane gespeichert!")
+        st.rerun()
 
-# --- KALENDER ---
+# --- KALENDER & EMPFEHLUNG immer anzeigen ---
 st.divider()
 st.subheader("📅 Kalender – Nächste 7 Tage")
 
-if st.session_state.bananas:
-    today = datetime.date.today()
-    covered = set()
-    for ci in st.session_state.bananas:
-        d = today + datetime.timedelta(days=DAYS_TO_OPTIMAL[ci])
-        if d >= today:
-            covered.add(d)
+today = datetime.date.today()
+covered = set()
 
+for ci in st.session_state.bananas:
+    d = today + datetime.timedelta(days=DAYS_TO_OPTIMAL[ci])
+    if d >= today:
+        covered.add(d)
+
+if st.session_state.bananas:
     cols = st.columns(7)
     for i, col in enumerate(cols):
         day = today + datetime.timedelta(days=i)
@@ -102,14 +103,27 @@ if st.session_state.bananas:
             col.markdown(f"""<div style='background-color:#2ecc71;padding:10px;border-radius:8px;text-align:center;color:white;'><b>{day.strftime('%a')}</b><br>{day.strftime('%d.%m')}<br>🍌</div>""", unsafe_allow_html=True)
         else:
             col.markdown(f"""<div style='background-color:#e74c3c;padding:10px;border-radius:8px;text-align:center;color:white;'><b>{day.strftime('%a')}</b><br>{day.strftime('%d.%m')}<br>❌</div>""", unsafe_allow_html=True)
+else:
+    st.info("📭 Noch keine Bananen gespeichert. Lade ein Foto hoch und speichere deine Bananen!")
 
-    # --- EINKAUFSEMPFEHLUNG ---
-    st.divider()
-    st.subheader("🛒 Einkaufsempfehlung")
+# --- EINKAUFSEMPFEHLUNG immer anzeigen ---
+st.divider()
+st.subheader("🛒 Einkaufsempfehlung")
 
-    red_days = [i for i in range(7) if today + datetime.timedelta(days=i) not in covered]
+red_days = [i for i in range(7) if today + datetime.timedelta(days=i) not in covered]
 
-    if not red_days:
-        st.success("👍 Du bist perfekt versorgt für die nächsten 7 Tage – kein Nachkauf nötig!")
+if not red_days:
+    st.success("👍 Du bist perfekt versorgt für die nächsten 7 Tage – kein Nachkauf nötig!")
+else:
+    nearest_red = min(red_days)
+    needed_stage = stage_to_buy_for_day(nearest_red)
+    st.warning(f"⚠️ Du hast **{len(red_days)} Tag(e)** ohne passende Banane!")
+    if nearest_red == 0:
+        st.error(f"🚨 Heute keine Banane! Kauf sofort eine in **{RIPENESS_LABELS[3]}** – die ist bereits perfekt!")
     else:
-        nearest_red = min(red_days)
+        st.info(f"👉 Kauf heute eine Banane in **{RIPENESS_LABELS[needed_stage]}**, damit du in **{nearest_red} Tag(en)** eine perfekte Banane hast!")
+
+if st.session_state.bananas:
+    if st.button("🗑️ Alle Bananen zurücksetzen"):
+        st.session_state.bananas = []
+        st.rerun()
