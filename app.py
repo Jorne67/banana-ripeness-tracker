@@ -3,7 +3,6 @@ from PIL import Image
 import numpy as np
 import keras
 import datetime
-import random
 
 st.set_page_config(page_title="🍌 Banana Ripeness Tracker", layout="centered")
 st.title("🍌 Banana Ripeness Tracker")
@@ -19,25 +18,17 @@ RIPENESS_LABELS = {
     6: "🟤 Stufe 7 – Braun",
 }
 
-# Realistischer Mittelwert der Tage bis Stufe 4 (Optimal)
 DAYS_TO_OPTIMAL = {
-    0: 7,   # Stufe 1 Grün → ~7 Tage
-    1: 5,   # Stufe 2 → ~5 Tage
-    2: 2,   # Stufe 3 → ~2 Tage
-    3: 0,   # Stufe 4 → heute perfekt
-    4: -1,  # Stufe 5 → gestern war optimal
-    5: -2,  # Stufe 6 → 2 Tage überschritten
-    6: -4,  # Stufe 7 → 4 Tage überschritten
+    0: 7,
+    1: 5,
+    2: 2,
+    3: 0,
+    4: -1,
+    5: -2,
+    6: -4,
 }
 
-# Einkaufsempfehlung: welche Stufe heute kaufen für Tag X
-# Ziel: in X Tagen soll sie Stufe 4 sein
 def stage_to_buy_for_day(days_from_now):
-    """Gibt die Stufe zurück die man heute kaufen muss um in X Tagen Stufe 4 zu haben."""
-    for stage, days in DAYS_TO_OPTIMAL.items():
-        if days == days_from_now:
-            return stage
-    # Nächstmögliche Stufe finden
     best = min(DAYS_TO_OPTIMAL.items(), key=lambda x: abs(x[1] - days_from_now))
     return best[0]
 
@@ -121,22 +112,4 @@ if st.session_state.bananas:
     if not red_days:
         st.success("👍 Du bist perfekt versorgt für die nächsten 7 Tage – kein Nachkauf nötig!")
     else:
-        st.warning(f"⚠️ Du hast **{len(red_days)} Tag(e)** ohne passende Banane!")
-        st.markdown("**Heute kaufen:**")
-        suggestions = set()
-        for rd in red_days:
-            stage = stage_to_buy_for_day(rd)
-            suggestions.add((rd, stage))
-
         nearest_red = min(red_days)
-needed_stage = stage_to_buy_for_day(nearest_red)
-if nearest_red == 0:
-    st.info(f"👉 Kauf heute sofort eine Banane in **{RIPENESS_LABELS[3]}** – du brauchst sie jetzt!")
-else:
-    st.info(f"👉 Kauf heute eine Banane in **{RIPENESS_LABELS[needed_stage]}**, damit du in {nearest_red} Tag(en) eine perfekte Banane hast!")
-    if st.button("🗑️ Alle Bananen zurücksetzen"):
-        st.session_state.bananas = []
-        st.rerun()
-
-else:
-    st.info("📭 Noch keine Bananen gespeichert. Lade ein Foto hoch und speichere deine Bananen!")
