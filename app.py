@@ -68,30 +68,32 @@ if uploaded_file:
     st.success(f"**Erkannter Reifegrad:** {RIPENESS_LABELS[class_index]}")
     st.write(f"Konfidenz: {confidence:.0%}")
 
-    st.markdown("**Einschätzung korrekt?** Du kannst den Reifegrad manuell anpassen:")
-    corrected_index = st.selectbox(
-        "Reifegrad auswählen:",
-        options=list(RIPENESS_LABELS.keys()),
-        index=int(class_index),
-        format_func=lambda x: RIPENESS_LABELS[x]
-    )
-
-    days = DAYS_TO_OPTIMAL[corrected_index]
+    # Tage bis optimal – manuell anpassbar
+    default_days = DAYS_TO_OPTIMAL[class_index]
     today = datetime.date.today()
 
-    if corrected_index != class_index:
-        st.info(f"✏️ Manuell angepasst auf: **{RIPENESS_LABELS[corrected_index]}**")
-
-    if days == 0:
-        st.success("✅ Diese Banane ist **heute** perfekt!")
-    elif days > 0:
-        optimal_date = today + datetime.timedelta(days=days)
-        st.info(f"📆 Perfekt am: **{optimal_date.strftime('%A, %d.%m.%Y')}** (in {days} Tagen)")
+    if default_days >= 0:
+        st.markdown("**Tage bis zum optimalen Reifegrad anpassen:**")
+        corrected_days = st.number_input(
+            "Tage bis perfekt:",
+            min_value=0,
+            max_value=14,
+            value=default_days,
+            step=1
+        )
     else:
-        st.warning(f"⚠️ Der optimale Zeitpunkt war vor {abs(days)} Tag(en) – Banane ist überreif.")
+        corrected_days = default_days
+
+    if corrected_days == 0:
+        st.success("✅ Diese Banane ist **heute** perfekt!")
+    elif corrected_days > 0:
+        optimal_date = today + datetime.timedelta(days=corrected_days)
+        st.info(f"📆 Perfekt am: **{optimal_date.strftime('%A, %d.%m.%Y')}** (in {corrected_days} Tagen)")
+    else:
+        st.warning(f"⚠️ Der optimale Zeitpunkt war vor {abs(corrected_days)} Tag(en) – Banane ist überreif.")
 
     if st.button("✅ Banane speichern"):
-        st.session_state.bananas.append(corrected_index)
+        st.session_state.bananas.append((class_index, corrected_days))
         st.rerun()
 
 # --- KALENDER ---
@@ -101,8 +103,9 @@ st.subheader("📅 Kalender – Nächste 7 Tage")
 today = datetime.date.today()
 covered = set()
 
-for ci in st.session_state.bananas:
-    d = today + datetime.timedelta(days=DAYS_TO_OPTIMAL[ci])
+for entry in st.session_state.bananas:
+    ci, days = entry
+    d = today + datetime.timedelta(days=days)
     if d >= today:
         covered.add(d)
 
