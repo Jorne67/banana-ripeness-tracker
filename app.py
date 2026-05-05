@@ -128,10 +128,12 @@ if st.session_state.bananas:
             stage = stage_to_buy_for_day(rd)
             suggestions.add((rd, stage))
 
-        furthest_red = max(red_days)
-        needed_stage = stage_to_buy_for_day(furthest_red)
-        st.info(f"👉 Kauf heute eine Banane in **{RIPENESS_LABELS[needed_stage]}**, damit du in {furthest_red} Tagen eine perfekte Banane hast!")
-
+        nearest_red = min(red_days)
+needed_stage = stage_to_buy_for_day(nearest_red)
+if nearest_red == 0:
+    st.info(f"👉 Kauf heute sofort eine Banane in **{RIPENESS_LABELS[3]}** – du brauchst sie jetzt!")
+else:
+    st.info(f"👉 Kauf heute eine Banane in **{RIPENESS_LABELS[needed_stage]}**, damit du in {nearest_red} Tag(en) eine perfekte Banane hast!")
     if st.button("🗑️ Alle Bananen zurücksetzen"):
         st.session_state.bananas = []
         st.rerun()
