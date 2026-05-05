@@ -13,7 +13,7 @@ RIPENESS_LABELS = {
     1: "🟡🟢 Stufe 2 – Mehr grün als gelb",
     2: "🟡🟢 Stufe 3 – Mehr gelb als grün",
     3: "🟡 Stufe 4 – Gelb mit grünen Spitzen ⭐ Optimal",
-    4: "🟡 Stufe 5 – Vollgelb",
+    4: "🟡 Stufe 5 – Vollgelb ⭐ Optimal",
     5: "🟡🟤 Stufe 6 – Vollgelb mit braunen Punkten",
     6: "🟤 Stufe 7 – Braun",
 }
@@ -23,7 +23,7 @@ DAYS_TO_OPTIMAL = {
     1: 5,
     2: 2,
     3: 0,
-    4: -1,
+    4: 0,   # Vollgelb ist jetzt auch optimal
     5: -2,
     6: -4,
 }
@@ -68,8 +68,20 @@ if uploaded_file:
     st.success(f"**Erkannter Reifegrad:** {RIPENESS_LABELS[class_index]}")
     st.write(f"Konfidenz: {confidence:.0%}")
 
-    days = DAYS_TO_OPTIMAL[class_index]
+    # Manuelle Korrektur
+    st.markdown("**Einschätzung korrekt?** Du kannst den Reifegrad manuell anpassen:")
+    corrected_index = st.selectbox(
+        "Reifegrad auswählen:",
+        options=list(RIPENESS_LABELS.keys()),
+        index=class_index,
+        format_func=lambda x: RIPENESS_LABELS[x]
+    )
+
+    days = DAYS_TO_OPTIMAL[corrected_index]
     today = datetime.date.today()
+
+    if corrected_index != class_index:
+        st.info(f"✏️ Manuell angepasst auf: **{RIPENESS_LABELS[corrected_index]}**")
 
     if days == 0:
         st.success("✅ Diese Banane ist **heute** perfekt!")
@@ -80,10 +92,10 @@ if uploaded_file:
         st.warning(f"⚠️ Der optimale Zeitpunkt war vor {abs(days)} Tag(en) – Banane ist überreif.")
 
     if st.button("✅ Banane speichern"):
-        st.session_state.bananas.append(class_index)
+        st.session_state.bananas.append(corrected_index)
         st.rerun()
 
-# --- KALENDER & EMPFEHLUNG immer anzeigen ---
+# --- KALENDER ---
 st.divider()
 st.subheader("📅 Kalender – Nächste 7 Tage")
 
@@ -106,7 +118,7 @@ if st.session_state.bananas:
 else:
     st.info("📭 Noch keine Bananen gespeichert. Lade ein Foto hoch und speichere deine Bananen!")
 
-# --- EINKAUFSEMPFEHLUNG immer anzeigen ---
+# --- EINKAUFSEMPFEHLUNG ---
 st.divider()
 st.subheader("🛒 Einkaufsempfehlung")
 
