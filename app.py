@@ -5,7 +5,7 @@ import keras
 import datetime
 
 st.set_page_config(page_title="🍌 Jarne's Bananen Frühstücksplaner", layout="centered")
-st.title("🍌 Banana Ripeness Tracker")
+st.title("🍌Jarne's intelligenter Bananen Frühstücksplaner")
 st.markdown("Lade ein Foto deiner Banane hoch und die App bestimmt den Reifegrad.")
 
 RIPENESS_LABELS = {
