@@ -4,7 +4,7 @@ import numpy as np
 import keras
 import datetime
 
-st.set_page_config(page_title="🍌 Banana Ripeness Tracker", layout="centered")
+st.set_page_config(page_title="🍌 Jarne's Bananen Frühstücksplaner", layout="centered")
 st.title("🍌 Banana Ripeness Tracker")
 st.markdown("Lade ein Foto deiner Banane hoch und die App bestimmt den Reifegrad.")
 
